@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   Plus,
-  MoreVertical,
   Calendar,
   CheckSquare,
   MessageSquare,
@@ -9,8 +8,7 @@ import {
   AlertCircle,
   Paperclip,
 } from 'lucide-react';
-import { Button } from '@evoapi/design-system';
-import type { Column, Task, Priority, ApprovalStatus } from '@/types/projects';
+import type { Column, Task, Priority } from '@/types/projects';
 import { projectsService } from '@/services/projects/projectsService';
 import { cn } from '@/utils/cn';
 
@@ -32,7 +30,6 @@ const priorityConfig: Record<Priority, { label: string; dot: string }> = {
 };
 
 export const KanbanView: React.FC<Props> = ({
-  projectId,
   columns,
   tasks,
   onTaskClick,

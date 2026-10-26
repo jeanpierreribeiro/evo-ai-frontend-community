@@ -3,19 +3,16 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   X,
   ChevronDown,
-  Building2,
   Plus,
   Home,
   Inbox,
   CheckSquare,
   Users2,
-  FolderKanban,
   Kanban,
   List,
   GitGraph,
   Calendar,
   Layers,
-  Sparkles,
 } from 'lucide-react';
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@evoapi/design-system';
 import { cn } from '@/utils/cn';

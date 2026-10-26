@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckSquare, Calendar, FolderKanban, AlertCircle, ArrowUpRight } from 'lucide-react';
+import { CheckSquare, Calendar, FolderKanban, ArrowUpRight } from 'lucide-react';
 import { useWorkspaceStore } from '@/store/workspaceStore';
 import { projectsService } from '@/services/projects/projectsService';
 import type { Task, Priority } from '@/types/projects';

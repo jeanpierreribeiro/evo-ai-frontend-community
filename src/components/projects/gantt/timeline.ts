@@ -1,6 +1,5 @@
 import {
   addDays,
-  differenceInCalendarDays,
   eachDayOfInterval,
   endOfWeek,
   parseISO,

@@ -7,19 +7,16 @@ import {
   Share2,
   CheckSquare,
   Link2,
-  Calendar,
   Clock,
-  MessageSquare,
   Plus,
   Trash2,
-  CheckCircle2,
   ShieldCheck,
   AlertCircle,
   ExternalLink,
   Send,
 } from 'lucide-react';
 import { Button } from '@evoapi/design-system';
-import type { Task, Column, Priority, RelationType } from '@/types/projects';
+import type { Task, Column, Priority, Activity } from '@/types/projects';
 import { projectsService } from '@/services/projects/projectsService';
 import { cn } from '@/utils/cn';
 
@@ -619,7 +616,7 @@ export const TaskDetailDrawer: React.FC<Props> = ({
 
             {activeTab === 'activity' && (
               <div className="space-y-2">
-                {task.activities?.map((act) => (
+                {task.activities?.map((act: Activity) => (
                   <div key={act.id} className="text-xs text-muted-foreground flex items-start gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5" />
                     <div>

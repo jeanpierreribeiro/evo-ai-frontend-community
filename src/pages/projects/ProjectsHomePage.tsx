@@ -7,7 +7,6 @@ import {
   TrendingUp,
   Plus,
   Calendar,
-  AlertCircle,
   ArrowRight,
   Activity as ActivityIcon,
   CheckSquare,

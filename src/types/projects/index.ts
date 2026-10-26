@@ -159,6 +159,7 @@ export interface Task {
   relationsTo?: TaskRelation[];
   timeEntries?: TimeEntry[];
   comments?: Comment[];
+  activities?: Activity[];
   completedSubtasks?: number;
   totalSubtasks?: number;
   subtaskProgress?: number;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Kanban,
   List,
@@ -30,7 +30,6 @@ import { TaskDetailDrawer } from '@/components/projects/task/TaskDetailDrawer';
 export const ProjectDetailsPage: React.FC = () => {
   const { projectId, view = 'kanban' } = useParams<{ projectId: string; view?: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const { activeWorkspace } = useWorkspaceStore();
 

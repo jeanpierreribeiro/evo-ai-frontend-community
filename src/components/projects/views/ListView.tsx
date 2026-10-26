@@ -18,7 +18,7 @@ const priorityConfig: Record<Priority, { label: string; badge: string }> = {
   URGENT: { label: 'Urgente', badge: 'bg-red-500/10 text-red-500' },
 };
 
-export const ListView: React.FC<Props> = ({ columns, tasks, onTaskClick, onOpenCreateTask }) => {
+export const ListView: React.FC<Props> = ({ tasks, onTaskClick }) => {
   return (
     <div className="flex-1 p-6 overflow-y-auto">
       <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">

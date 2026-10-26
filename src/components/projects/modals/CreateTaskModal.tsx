@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckSquare, Plus } from 'lucide-react';
+import { X, CheckSquare } from 'lucide-react';
 import { Button } from '@evoapi/design-system';
 import type { Column, Priority, Task } from '@/types/projects';
 import { projectsService } from '@/services/projects/projectsService';

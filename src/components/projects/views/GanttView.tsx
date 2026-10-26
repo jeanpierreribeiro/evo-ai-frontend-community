@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { format, differenceInCalendarDays, addDays, subDays, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react';
 import { Button } from '@evoapi/design-system';
 import type { Task } from '@/types/projects';
 import { buildGanttTimeline, parseTaskDate } from '../gantt/timeline';

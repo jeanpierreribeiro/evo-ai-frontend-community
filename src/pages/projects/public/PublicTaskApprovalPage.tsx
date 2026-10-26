@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@evoapi/design-system';
 import { projectsService } from '@/services/projects/projectsService';
-import type { Task, ApprovalStatus } from '@/types/projects';
+import type { ApprovalStatus } from '@/types/projects';
 
 export const PublicTaskApprovalPage: React.FC = () => {
   const { token } = useParams<{ token: string }>();
