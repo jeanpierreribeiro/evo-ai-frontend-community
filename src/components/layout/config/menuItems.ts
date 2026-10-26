@@ -144,7 +144,7 @@ export const getCustomerMenuItems = (t: (key: string) => string): MenuItem[] => 
   },
   {
     id: 'customer-projects',
-    name: t('menu.customer.projects') || 'Projetos',
+    name: t('menu.customer.projects'),
     href: '/projects',
     icon: FolderKanban,
     subItems: [

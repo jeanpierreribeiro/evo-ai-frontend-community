@@ -176,6 +176,8 @@ const AppRouter = () => {
             }
           />
 
+          <Route path="/auth" element={<Navigate to="/login" replace />} />
+
           <Route
             path="/auth/confirm-email"
             element={
