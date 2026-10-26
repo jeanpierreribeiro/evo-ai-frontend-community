@@ -92,7 +92,8 @@
       "tutorials": "Tutorials",
       "settings": "Settings",
       "campaigns": "Campaigns",
-      "journeys": "Journeys"
+      "journeys": "Journeys",
+      "scheduling": "Scheduling"
     },
     "contacts": {
       "list": "Contacts",
@@ -122,6 +123,12 @@
       "segments": "Segments",
       "crmForms": "Lead capture forms",
       "chatPages": "Chat pages"
+    },
+    "scheduling": {
+      "bookings": "Bookings",
+      "eventTypes": "Event Types",
+      "availability": "Availability",
+      "publicPreview": "Public Page"
     }
   }
 }

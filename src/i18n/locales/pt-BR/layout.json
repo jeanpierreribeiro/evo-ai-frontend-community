@@ -92,7 +92,8 @@
       "tutorials": "Tutoriais",
       "settings": "Configurações",
       "campaigns": "Campanhas",
-      "journeys": "Jornadas"
+      "journeys": "Jornadas",
+      "scheduling": "Agenda"
     },
     "contacts": {
       "list": "Contatos",
@@ -122,6 +123,12 @@
       "segments": "Segmentos",
       "crmForms": "Formulários de captura",
       "chatPages": "Páginas de chat"
+    },
+    "scheduling": {
+      "bookings": "Compromissos",
+      "eventTypes": "Tipos de Evento",
+      "availability": "Disponibilidade",
+      "publicPreview": "Minha Página Pública"
     }
   }
 }

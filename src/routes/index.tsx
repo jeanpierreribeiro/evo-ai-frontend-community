@@ -108,6 +108,14 @@ import Profile from '@/pages/Shared/Profile';
 import Setup from '@/pages/Setup/Setup';
 import OnboardingPage from '@/pages/Setup/OnboardingPage';
 
+// Páginas de agendamento (jprOS + Cal.com Engine)
+import BookingsPage from '@/pages/scheduling/BookingsPage';
+import EventTypesPage from '@/pages/scheduling/EventTypesPage';
+import AvailabilityPage from '@/pages/scheduling/AvailabilityPage';
+import PublicPreviewPage from '@/pages/scheduling/PublicPreviewPage';
+import PublicBookingPage from '@/pages/scheduling/public/PublicBookingPage';
+import PublicProfilePage from '@/pages/scheduling/public/PublicProfilePage';
+
 // Outras páginas
 import NotFound from '@/pages/NotFound';
 import Unauthorized from '@/pages/Unauthorized';
@@ -394,6 +402,25 @@ const AppRouter = () => {
             element={
               <PublicRoute>
                 <PublicChatPage />
+              </PublicRoute>
+            }
+          />
+
+
+          {/* Public Scheduling routes */}
+          <Route
+            path="/book/:username"
+            element={
+              <PublicRoute>
+                <PublicProfilePage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/book/:username/:eventSlug"
+            element={
+              <PublicRoute>
+                <PublicBookingPage />
               </PublicRoute>
             }
           />
@@ -1408,6 +1435,57 @@ const AppRouter = () => {
           <Route path="/conversations" element={ChatRouteElement} />
 
           <Route path="/conversations/:conversationId" element={ChatRouteElement} />
+
+
+          {/* Scheduling Routes (jprOS + Cal.com Engine) */}
+          <Route
+            path="/scheduling/bookings"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <BookingsPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/scheduling/event-types"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <EventTypesPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/scheduling/availability"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <AvailabilityPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/scheduling/public-preview"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <PublicPreviewPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
 
           {/* Tutoriais */}
           <Route
