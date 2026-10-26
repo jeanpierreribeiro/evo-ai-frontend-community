@@ -116,6 +116,12 @@ import PublicPreviewPage from '@/pages/scheduling/PublicPreviewPage';
 import PublicBookingPage from '@/pages/scheduling/public/PublicBookingPage';
 import PublicProfilePage from '@/pages/scheduling/public/PublicProfilePage';
 
+// Páginas de projetos (jprOS + Kaneo Engine)
+import ProjectsHomePage from '@/pages/projects/ProjectsHomePage';
+import ProjectsInboxPage from '@/pages/projects/ProjectsInboxPage';
+import ProjectsMyTasksPage from '@/pages/projects/ProjectsMyTasksPage';
+import WorkspaceMembersPage from '@/pages/projects/WorkspaceMembersPage';
+
 // Outras páginas
 import NotFound from '@/pages/NotFound';
 import Unauthorized from '@/pages/Unauthorized';
@@ -1481,6 +1487,56 @@ const AppRouter = () => {
                 <CustomerRoute>
                   <MainLayout>
                     <PublicPreviewPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+
+          {/* Projects Routes (jprOS + Kaneo Engine) */}
+          <Route
+            path="/projects"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <ProjectsHomePage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects/inbox"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <ProjectsInboxPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects/my-tasks"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <ProjectsMyTasksPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects/members"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <WorkspaceMembersPage />
                   </MainLayout>
                 </CustomerRoute>
               </PrivateRoute>

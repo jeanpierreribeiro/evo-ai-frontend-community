@@ -14,6 +14,7 @@ import MenuItem from './MenuItem';
 import { MenuItem as MenuItemType } from '../config/menuItems';
 import { cn } from '@/utils/cn';
 import { PluginSlot } from '@/plugin-host';
+import { ProjectsSidebarDrawer } from '@/components/projects/ProjectsSidebarDrawer';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -277,12 +278,16 @@ export default function Sidebar({
           )}
         >
           {activeSubmenu && (
-            <>
-              {submenuHeader(activeSubmenu)}
-              <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-                {submenuItems(activeSubmenu)}
-              </nav>
-            </>
+            activeSubmenu.id === 'customer-projects' ? (
+              <ProjectsSidebarDrawer onClose={() => setActiveSubmenu(null)} />
+            ) : (
+              <>
+                {submenuHeader(activeSubmenu)}
+                <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+                  {submenuItems(activeSubmenu)}
+                </nav>
+              </>
+            )
           )}
         </div>
       )}
@@ -290,10 +295,16 @@ export default function Sidebar({
       {/* Expanded mode submenu panel — standard in-flow panel, no animation needed */}
       {!isCollapsed && activeSubmenu && (
         <div className="hidden md:flex w-64 bg-sidebar text-sidebar-foreground flex-col border-r border-sidebar-border">
-          {submenuHeader(activeSubmenu)}
-          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            {submenuItems(activeSubmenu)}
-          </nav>
+          {activeSubmenu.id === 'customer-projects' ? (
+            <ProjectsSidebarDrawer onClose={() => setActiveSubmenu(null)} />
+          ) : (
+            <>
+              {submenuHeader(activeSubmenu)}
+              <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+                {submenuItems(activeSubmenu)}
+              </nav>
+            </>
+          )}
         </div>
       )}
     </>

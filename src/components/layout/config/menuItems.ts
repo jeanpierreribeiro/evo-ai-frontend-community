@@ -32,6 +32,7 @@ import {
   Calendar,
   CalendarDays,
   Globe,
+  FolderKanban,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -138,6 +139,34 @@ export const getCustomerMenuItems = (t: (key: string) => string): MenuItem[] => 
         name: t('menu.scheduling.publicPreview'),
         href: '/scheduling/public-preview',
         icon: Globe,
+      },
+    ],
+  },
+  {
+    id: 'customer-projects',
+    name: t('menu.customer.projects') || 'Projetos',
+    href: '/projects',
+    icon: FolderKanban,
+    subItems: [
+      {
+        name: 'Início (Home)',
+        href: '/projects',
+        icon: FolderKanban,
+      },
+      {
+        name: 'Caixa de Entrada',
+        href: '/projects/inbox',
+        icon: FolderKanban,
+      },
+      {
+        name: 'Minhas Tarefas',
+        href: '/projects/my-tasks',
+        icon: FolderKanban,
+      },
+      {
+        name: 'Membros da Empresa',
+        href: '/projects/members',
+        icon: FolderKanban,
       },
     ],
   },
