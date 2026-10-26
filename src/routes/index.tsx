@@ -121,6 +121,8 @@ import ProjectsHomePage from '@/pages/projects/ProjectsHomePage';
 import ProjectsInboxPage from '@/pages/projects/ProjectsInboxPage';
 import ProjectsMyTasksPage from '@/pages/projects/ProjectsMyTasksPage';
 import WorkspaceMembersPage from '@/pages/projects/WorkspaceMembersPage';
+import ProjectDetailsPage from '@/pages/projects/ProjectDetailsPage';
+import PublicTaskApprovalPage from '@/pages/projects/public/PublicTaskApprovalPage';
 
 // Outras páginas
 import NotFound from '@/pages/NotFound';
@@ -427,6 +429,16 @@ const AppRouter = () => {
             element={
               <PublicRoute>
                 <PublicBookingPage />
+              </PublicRoute>
+            }
+          />
+
+          {/* Public Task Validation & Approval Route */}
+          <Route
+            path="/p/task/:token"
+            element={
+              <PublicRoute>
+                <PublicTaskApprovalPage />
               </PublicRoute>
             }
           />
@@ -1537,6 +1549,30 @@ const AppRouter = () => {
                 <CustomerRoute>
                   <MainLayout>
                     <WorkspaceMembersPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects/:projectId"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <ProjectDetailsPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects/:projectId/:view"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <ProjectDetailsPage />
                   </MainLayout>
                 </CustomerRoute>
               </PrivateRoute>
