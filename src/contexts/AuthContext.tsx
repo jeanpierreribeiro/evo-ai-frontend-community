@@ -57,7 +57,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const isWidgetPublicRoute =
       window.location.pathname === '/widget' ||
-      window.location.pathname.startsWith('/survey/responses/');
+      window.location.pathname.startsWith('/survey/responses/') ||
+      window.location.pathname.startsWith('/f/') ||
+      window.location.pathname.startsWith('/chat/') ||
+      window.location.pathname.startsWith('/book');
     if (isWidgetPublicRoute) {
       validityCheckCalled.current = true;
       setLoading(false);
@@ -93,7 +96,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const isWidgetPublicRoute =
       window.location.pathname === '/widget' ||
-      window.location.pathname.startsWith('/survey/responses/');
+      window.location.pathname.startsWith('/survey/responses/') ||
+      window.location.pathname.startsWith('/f/') ||
+      window.location.pathname.startsWith('/chat/') ||
+      window.location.pathname.startsWith('/book');
     if (isWidgetPublicRoute) return;
     if (!isAuthenticated || !user) return;
 

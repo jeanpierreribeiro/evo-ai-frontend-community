@@ -16,11 +16,11 @@ const SPECIAL_ROUTES = {
   // (/f/:slug) + public chat page (/chat/:slug). The latter two must be
   // reachable by logged-out visitors — they bypass the protected-route auth
   // check below.
-  PUBLIC_ROUTES: ['/auth', '/login', '/register', '/widget', '/setup', '/f/', '/chat/'],
+  PUBLIC_ROUTES: ['/auth', '/login', '/register', '/widget', '/setup', '/f/', '/chat/', '/book'],
   // Routes that bypass the "redirect authenticated users to /conversations" rule.
   // /f/ and /chat/ are public-facing pages an authenticated user may legitimately
   // open (e.g. to preview their own form/chat page) without being bounced away.
-  AUTH_EXEMPT_ROUTES: ['/setup/onboarding', '/f/', '/chat/'],
+  AUTH_EXEMPT_ROUTES: ['/setup/onboarding', '/f/', '/chat/', '/book'],
 };
 
 const RouterGuard: React.FC<RouterGuardProps> = ({ children }) => {

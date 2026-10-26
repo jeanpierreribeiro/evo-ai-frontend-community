@@ -29,6 +29,9 @@ import {
   Route,
   ShieldCheck,
   FileText,
+  Calendar,
+  CalendarDays,
+  Globe,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -107,6 +110,34 @@ export const getCustomerMenuItems = (t: (key: string) => string): MenuItem[] => 
         icon: Clock,
         resource: 'contacts',
         action: 'read',
+      },
+    ],
+  },
+  {
+    id: 'customer-scheduling',
+    name: t('menu.customer.scheduling'),
+    href: '/scheduling/bookings',
+    icon: Calendar,
+    subItems: [
+      {
+        name: t('menu.scheduling.bookings'),
+        href: '/scheduling/bookings',
+        icon: CalendarDays,
+      },
+      {
+        name: t('menu.scheduling.eventTypes'),
+        href: '/scheduling/event-types',
+        icon: Layers,
+      },
+      {
+        name: t('menu.scheduling.availability'),
+        href: '/scheduling/availability',
+        icon: Clock,
+      },
+      {
+        name: t('menu.scheduling.publicPreview'),
+        href: '/scheduling/public-preview',
+        icon: Globe,
       },
     ],
   },

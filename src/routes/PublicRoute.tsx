@@ -44,7 +44,8 @@ const PublicRoute = ({ children }: PublicRouteProps) => {
       location.pathname === '/widget' ||
       location.pathname.startsWith('/survey/responses/') ||
       location.pathname.startsWith('/f/') ||
-      location.pathname.startsWith('/chat/')
+      location.pathname.startsWith('/chat/') ||
+      location.pathname.startsWith('/book')
     ) {
       return <>{children}</>;
     }
