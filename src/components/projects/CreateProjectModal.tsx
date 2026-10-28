@@ -15,6 +15,7 @@ const PRESET_COLORS = ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#
 
 export const CreateProjectModal: React.FC<Props> = ({ isOpen, workspaceId, onClose, onSuccess }) => {
   const [name, setName] = useState('');
+  const [key, setKey] = useState('');
   const [description, setDescription] = useState('');
   const [color, setColor] = useState('#6366f1');
   const [loading, setLoading] = useState(false);
@@ -34,12 +35,14 @@ export const CreateProjectModal: React.FC<Props> = ({ isOpen, workspaceId, onClo
     try {
       const created = await projectsService.createProject(workspaceId, {
         name: name.trim(),
+        key: key.trim().toUpperCase() || undefined,
         description: description.trim() || undefined,
         color,
       });
       onSuccess(created);
       onClose();
       setName('');
+      setKey('');
       setDescription('');
     } catch (err: any) {
       setError(err?.response?.data?.error || err.message || 'Erro ao criar projeto');
@@ -83,6 +86,25 @@ export const CreateProjectModal: React.FC<Props> = ({ isOpen, workspaceId, onClo
               className="w-full px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder:text-muted-foreground"
               autoFocus
             />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Chave do Projeto (Opcional)
+              </label>
+              <span className="text-[11px] text-muted-foreground">Ex: PROJ, ALF, DEV</span>
+            </div>
+            <input
+              type="text"
+              value={key}
+              onChange={(e) => setKey(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10))}
+              placeholder="Auto-gerada se vazia (2 a 10 letras/números)"
+              className="w-full px-3 py-2 text-sm font-mono uppercase bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder:text-muted-foreground"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Usada no prefixo de todas as tarefas (ex: {key || 'PROJ'}-123). Imutável após criar tarefas.
+            </p>
           </div>
 
           <div>

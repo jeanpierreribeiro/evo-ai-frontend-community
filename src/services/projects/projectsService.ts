@@ -5,6 +5,7 @@ import type {
   Project,
   Column,
   Task,
+  Label,
   DashboardData,
   Notification,
   Priority,
@@ -42,7 +43,7 @@ export const projectsService = {
     return data.data;
   },
 
-  async addMember(workspaceId: string, payload: { userId: string; email: string; name: string; role?: string }): Promise<WorkspaceMember> {
+  async addMember(workspaceId: string, payload: { userId: string; email: string; name: string; role?: string; avatarUrl?: string }): Promise<WorkspaceMember> {
     const { data } = await projectsApi.post(`/workspaces/${workspaceId}/members`, payload);
     return data.data;
   },
@@ -58,8 +59,8 @@ export const projectsService = {
   },
 
   // --- Inbox ---
-  async getInbox(workspaceId: string): Promise<Notification[]> {
-    const { data } = await projectsApi.get(`/workspaces/${workspaceId}/inbox`);
+  async getInbox(workspaceId: string, params?: { unreadOnly?: boolean; archived?: boolean; includeArchived?: boolean }): Promise<Notification[]> {
+    const { data } = await projectsApi.get(`/workspaces/${workspaceId}/inbox`, { params });
     return data.data;
   },
 
@@ -69,6 +70,14 @@ export const projectsService = {
 
   async markAllNotificationsRead(workspaceId: string): Promise<void> {
     await projectsApi.post(`/workspaces/${workspaceId}/inbox/mark-all-read`);
+  },
+
+  async archiveNotification(id: string): Promise<void> {
+    await projectsApi.patch(`/inbox/${id}/archive`);
+  },
+
+  async unarchiveNotification(id: string): Promise<void> {
+    await projectsApi.patch(`/inbox/${id}/unarchive`);
   },
 
   // --- My Tasks ---
@@ -85,7 +94,10 @@ export const projectsService = {
     return data.data;
   },
 
-  async createProject(workspaceId: string, payload: { name: string; description?: string; color?: string; icon?: string }): Promise<Project> {
+  async createProject(
+    workspaceId: string,
+    payload: { name: string; key?: string; description?: string; color?: string; icon?: string; backlogColumnId?: string }
+  ): Promise<Project> {
     const { data } = await projectsApi.post(`/workspaces/${workspaceId}/projects`, payload);
     return data.data;
   },
@@ -124,8 +136,11 @@ export const projectsService = {
     await projectsApi.put(`/projects/${projectId}/columns/reorder`, { columns });
   },
 
-  async deleteColumn(id: string): Promise<void> {
-    await projectsApi.delete(`/columns/${id}`);
+  async deleteColumn(id: string, destinationColumnId?: string): Promise<void> {
+    await projectsApi.delete(`/columns/${id}`, {
+      data: destinationColumnId ? { destinationColumnId } : undefined,
+      params: destinationColumnId ? { destinationColumnId } : undefined,
+    });
   },
 
   // --- Tasks ---
@@ -144,8 +159,8 @@ export const projectsService = {
     return data.data;
   },
 
-  async updateTask(id: string, payload: Partial<Task>): Promise<Task> {
-    const { data } = await projectsApi.put(`/tasks/${id}`, payload);
+  async updateTask(id: string, payload: Partial<Task> & { expectedVersion?: number }): Promise<Task> {
+    const { data } = await projectsApi.patch(`/tasks/${id}`, payload);
     return data.data;
   },
 
@@ -156,17 +171,6 @@ export const projectsService = {
 
   async deleteTask(id: string): Promise<void> {
     await projectsApi.delete(`/tasks/${id}`);
-  },
-
-  async generateApprovalLink(taskId: string): Promise<{
-    taskId: string;
-    taskNumber: number;
-    approvalToken: string;
-    approvalPin: string;
-    approvalStatus: string;
-  }> {
-    const { data } = await projectsApi.post(`/tasks/${taskId}/approval/generate`);
-    return data.data;
   },
 
   // Subtasks
@@ -224,25 +228,189 @@ export const projectsService = {
     await projectsApi.delete(`/comments/${id}`);
   },
 
-  // Public Validation Portal
-  async getPublicTaskPreview(token: string) {
-    const { data } = await projectsApi.get(`/public/tasks/${token}/preview`);
-    return data.data;
-  },
-
-  async validateTaskPin(token: string, pin: string) {
-    const { data } = await projectsApi.post(`/public/tasks/${token}/validate-pin`, { pin });
-    return data.data;
-  },
-
-  async approveDelivery(token: string, pin: string) {
-    const { data } = await projectsApi.post(`/public/tasks/${token}/approve`, { pin });
+  // Public Task Sharing (Phase 2 - E2.2 & E2.3)
+  async previewTaskShare(taskId: string, payload: any) {
+    const { data } = await projectsApi.post(`/tasks/${taskId}/shares/preview`, payload);
     return data;
   },
 
-  async requestChanges(token: string, pin: string, feedback: string) {
-    const { data } = await projectsApi.post(`/public/tasks/${token}/request-changes`, { pin, feedback });
+  async createTaskShare(taskId: string, payload: any) {
+    const { data } = await projectsApi.post(`/tasks/${taskId}/shares`, payload);
     return data;
+  },
+
+  async listTaskShares(taskId: string) {
+    const { data } = await projectsApi.get(`/tasks/${taskId}/shares`);
+    return data.data;
+  },
+
+  async patchTaskShare(shareId: string, payload: any) {
+    const { data } = await projectsApi.patch(`/shares/${shareId}`, payload);
+    return data;
+  },
+
+  async revokeTaskShare(shareId: string) {
+    const { data } = await projectsApi.post(`/shares/${shareId}/revoke`);
+    return data;
+  },
+
+  async reissueTaskShare(shareId: string) {
+    const { data } = await projectsApi.post(`/shares/${shareId}/reissue`);
+    return data;
+  },
+
+  async unlockPublicShare(token: string, pin: string) {
+    const { data } = await projectsApi.post(`/public/shares/${token}/unlock`, { pin });
+    return data;
+  },
+
+  async getPublicTaskCard(token: string, sessionToken?: string) {
+    const headers: Record<string, string> = {};
+    if (sessionToken) {
+      headers.Authorization = `Bearer ${sessionToken}`;
+    }
+    const { data } = await projectsApi.get(`/public/shares/${token}/card`, { headers });
+    return data.data;
+  },
+
+  async logoutPublicShare(token: string) {
+    const { data } = await projectsApi.post(`/public/shares/${token}/logout`);
+    return data;
+  },
+
+  // --- Labels (E3.3-a) ---
+  async listLabels(workspaceId: string): Promise<Label[]> {
+    const { data } = await projectsApi.get(`/workspaces/${workspaceId}/labels`);
+    return data.data;
+  },
+
+  async createLabel(workspaceId: string, payload: { name: string; color?: string }): Promise<Label> {
+    const { data } = await projectsApi.post(`/workspaces/${workspaceId}/labels`, payload);
+    return data.data;
+  },
+
+  async updateLabel(id: string, payload: { name?: string; color?: string }): Promise<Label> {
+    const { data } = await projectsApi.patch(`/labels/${id}`, payload);
+    return data.data;
+  },
+
+  async deleteLabel(id: string): Promise<void> {
+    await projectsApi.delete(`/labels/${id}`);
+  },
+
+  // --- Attachments (E3.7) ---
+  async listTaskAttachments(taskId: string) {
+    const { data } = await projectsApi.get(`/tasks/${taskId}/attachments`);
+    return data.data;
+  },
+
+  async uploadTaskAttachment(taskId: string, file: File, commentId?: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (commentId) {
+      formData.append('commentId', commentId);
+    }
+    const { data } = await projectsApi.post(`/tasks/${taskId}/attachments`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return data.data;
+  },
+
+  async deleteTaskAttachment(id: string): Promise<void> {
+    await projectsApi.delete(`/attachments/${id}`);
+  },
+
+  getAttachmentDownloadUrl(id: string): string {
+    const rawBaseUrl = import.meta.env.VITE_PROJECTS_API_URL || 'http://localhost:3013';
+    const clean = rawBaseUrl.endsWith('/api/v1/projects')
+      ? rawBaseUrl
+      : `${rawBaseUrl.replace(/\/+$/, '')}/api/v1/projects`;
+    return `${clean}/attachments/${id}/download`;
+  },
+
+  // --- Custom Fields (E3.8) ---
+  async listCustomFields(projectId: string) {
+    const { data } = await projectsApi.get(`/projects/${projectId}/custom-fields`);
+    return data.data;
+  },
+
+  async createCustomField(projectId: string, payload: { name: string; type: string; options?: any[]; isPublicEligible?: boolean }) {
+    const { data } = await projectsApi.post(`/projects/${projectId}/custom-fields`, payload);
+    return data.data;
+  },
+
+  async updateCustomField(id: string, payload: { name?: string; options?: any[]; isPublicEligible?: boolean }) {
+    const { data } = await projectsApi.patch(`/custom-fields/${id}`, payload);
+    return data.data;
+  },
+
+  async deleteCustomField(id: string): Promise<void> {
+    await projectsApi.delete(`/custom-fields/${id}`);
+  },
+
+  async getTaskCustomFieldValues(taskId: string) {
+    const { data } = await projectsApi.get(`/tasks/${taskId}/custom-field-values`);
+    return data.data;
+  },
+
+  async setTaskCustomFieldValues(taskId: string, values: Array<{ fieldId: string; value?: any }>) {
+    const { data } = await projectsApi.put(`/tasks/${taskId}/custom-field-values`, { values });
+    return data.data;
+  },
+
+  // --- Time Entries Details (E3.8-c) ---
+  async listTimeEntries(taskId: string): Promise<{ entries: any[]; totalMinutes: number; totalHours: number }> {
+    const { data } = await projectsApi.get(`/tasks/${taskId}/time-entries`);
+    return data.data;
+  },
+
+  async updateTimeEntry(id: string, payload: { description?: string; durationMinutes?: number; date?: string }) {
+    const { data } = await projectsApi.patch(`/time-entries/${id}`, payload);
+    return data.data;
+  },
+
+  // --- Cross-Project Transfer (E3.6-e) ---
+  async previewTaskTransfer(taskId: string, targetProjectId: string) {
+    const { data } = await projectsApi.post(`/tasks/${taskId}/transfer/preview`, { targetProjectId });
+    return data.data;
+  },
+
+  async executeTaskTransfer(taskId: string, targetProjectId: string, targetColumnId?: string) {
+    const { data } = await projectsApi.post(`/tasks/${taskId}/transfer`, { targetProjectId, targetColumnId });
+    return data.data;
+  },
+
+  // --- Lifecycle: Archive, Unarchive & Restore (E3.6-d) ---
+  async archiveTask(taskId: string) {
+    const { data } = await projectsApi.post(`/tasks/${taskId}/archive`);
+    return data.data;
+  },
+
+  async unarchiveTask(taskId: string) {
+    const { data } = await projectsApi.post(`/tasks/${taskId}/unarchive`);
+    return data.data;
+  },
+
+  async restoreTask(taskId: string) {
+    const { data } = await projectsApi.post(`/tasks/${taskId}/restore`);
+    return data.data;
+  },
+
+  async archiveProject(projectId: string) {
+    const { data } = await projectsApi.post(`/projects/${projectId}/archive`);
+    return data.data;
+  },
+
+  async unarchiveProject(projectId: string) {
+    const { data } = await projectsApi.post(`/projects/${projectId}/unarchive`);
+    return data.data;
+  },
+
+  async restoreProject(projectId: string) {
+    const { data } = await projectsApi.post(`/projects/${projectId}/restore`);
+    return data.data;
   },
 };
 

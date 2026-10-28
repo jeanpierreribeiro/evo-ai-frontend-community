@@ -33,6 +33,10 @@ import {
   CalendarDays,
   Globe,
   FolderKanban,
+  Landmark,
+  CircleDollarSign,
+  ArrowLeftRight,
+  BarChart3,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -167,6 +171,49 @@ export const getCustomerMenuItems = (t: (key: string) => string): MenuItem[] => 
         name: 'Membros da Empresa',
         href: '/projects/members',
         icon: FolderKanban,
+      },
+    ],
+  },
+  {
+    id: 'customer-finance',
+    name: t('menu.customer.finance') || 'Financeiro',
+    href: '/finance',
+    icon: Landmark,
+    subItems: [
+      {
+        name: 'Cockpit Financeiro',
+        href: '/finance',
+        icon: PieChart,
+      },
+      {
+        name: 'Movimentações de Caixa',
+        href: '/finance/transactions',
+        icon: ArrowLeftRight,
+      },
+      {
+        name: 'Contas a Pagar',
+        href: '/finance/payables',
+        icon: Calendar,
+      },
+      {
+        name: 'Contas a Receber',
+        href: '/finance/receivables',
+        icon: CircleDollarSign,
+      },
+      {
+        name: 'Conciliação Bancária & OFX',
+        href: '/finance/reconciliation',
+        icon: Layers,
+      },
+      {
+        name: 'DRE & Relatórios',
+        href: '/finance/reports',
+        icon: BarChart3,
+      },
+      {
+        name: 'Configurações',
+        href: '/finance/settings',
+        icon: Settings,
       },
     ],
   },

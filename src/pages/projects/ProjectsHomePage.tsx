@@ -23,6 +23,7 @@ export const ProjectsHomePage: React.FC = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
+  const [activityLimit, setActivityLimit] = useState(7);
 
   useEffect(() => {
     fetchWorkspaces();
@@ -206,14 +207,15 @@ export const ProjectsHomePage: React.FC = () => {
                     {data.upcomingTasks.map((task) => (
                       <div
                         key={task.id}
-                        onClick={() => navigate(`/projects/${task.projectId}/kanban`)}
-                        className="p-3 rounded-lg border border-border/60 hover:bg-muted/40 transition-colors cursor-pointer flex items-center justify-between gap-3"
+                        onClick={() => navigate(`/projects/tasks/${task.id}`)}
+                        className="p-3 rounded-lg border border-border/60 hover:bg-muted/40 transition-colors cursor-pointer flex items-center justify-between gap-3 group"
+                        title="Ver detalhes da tarefa"
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <span className="text-xs font-bold text-muted-foreground">
-                            #{task.taskNumber}
+                          <span className="text-xs font-bold font-mono text-muted-foreground group-hover:text-primary transition-colors">
+                            {task.displayCode || `#${task.taskNumber}`}
                           </span>
-                          <span className="text-xs font-medium text-foreground truncate">
+                          <span className="text-xs font-medium text-foreground truncate group-hover:text-primary transition-colors">
                             {task.title}
                           </span>
                           {task.project && (
@@ -260,7 +262,7 @@ export const ProjectsHomePage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-3.5">
-                    {data.activities.map((act) => (
+                    {data.activities.slice(0, activityLimit).map((act) => (
                       <div key={act.id} className="flex items-start gap-2.5 text-xs">
                         <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
                         <div className="flex-1">
@@ -276,7 +278,11 @@ export const ProjectsHomePage: React.FC = () => {
                               {!['created_task', 'updated_task', 'moved_column', 'added_comment', 'delivery_approved', 'changes_requested'].includes(act.action) && act.action}
                             </span>{' '}
                             {act.task && (
-                              <span className="font-medium text-primary">
+                              <span
+                                onClick={() => navigate(`/projects/tasks/${act.task!.id}`)}
+                                className="font-medium text-primary hover:underline cursor-pointer"
+                                title="Ver detalhes da tarefa"
+                              >
                                 #{act.task.taskNumber} {act.task.title}
                               </span>
                             )}
@@ -287,6 +293,17 @@ export const ProjectsHomePage: React.FC = () => {
                         </div>
                       </div>
                     ))}
+
+                    {data.activities.length > activityLimit && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setActivityLimit((prev) => prev + 10)}
+                        className="w-full text-xs text-muted-foreground hover:text-foreground h-8"
+                      >
+                        Carregar mais atividades ({data.activities.length - activityLimit} restantes)
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>

@@ -64,12 +64,12 @@ export const ProjectsMyTasksPage: React.FC = () => {
             return (
               <div
                 key={task.id}
-                onClick={() => navigate(`/projects/${task.projectId}/kanban`)}
+                onClick={() => navigate(`/projects/tasks/${task.id}`)}
                 className="p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group shadow-sm"
               >
                 <div className="flex items-start gap-3 min-w-0">
-                  <span className="text-xs font-bold text-muted-foreground mt-0.5">
-                    #{task.taskNumber}
+                  <span className="text-xs font-bold font-mono text-muted-foreground mt-0.5">
+                    {task.displayCode || `#${task.taskNumber}`}
                   </span>
                   <div>
                     <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">

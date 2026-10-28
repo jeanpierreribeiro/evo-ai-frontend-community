@@ -12,6 +12,7 @@ interface WorkspaceState {
   fetchWorkspaces: () => Promise<void>;
   setActiveWorkspace: (workspace: Workspace | null) => void;
   setActiveWorkspaceById: (id: string) => void;
+  reset: () => void;
 }
 
 export const useWorkspaceStore = create<WorkspaceState>()(
@@ -21,6 +22,15 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       activeWorkspace: null,
       isLoading: false,
       error: null,
+
+      reset: () => {
+        set({ workspaces: [], activeWorkspace: null, error: null, isLoading: false });
+        try {
+          localStorage.removeItem('jpros_workspace_storage');
+        } catch {
+          // noop
+        }
+      },
 
       fetchWorkspaces: async () => {
         set({ isLoading: true, error: null });

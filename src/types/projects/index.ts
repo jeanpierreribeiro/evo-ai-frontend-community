@@ -11,6 +11,7 @@ export interface WorkspaceMember {
   name: string;
   avatarUrl?: string | null;
   role: WorkspaceRole;
+  status?: string;
   createdAt: string;
 }
 
@@ -21,6 +22,7 @@ export interface Workspace {
   description?: string | null;
   color?: string | null;
   avatarUrl?: string | null;
+  timezone?: string;
   members?: WorkspaceMember[];
   _count?: {
     projects: number;
@@ -46,6 +48,9 @@ export interface Project {
   workspaceId: string;
   name: string;
   slug: string;
+  key?: string;
+  taskCounter?: number;
+  backlogColumnId?: string | null;
   description?: string | null;
   color?: string | null;
   icon?: string | null;
@@ -122,6 +127,9 @@ export interface Comment {
 export interface Task {
   id: string;
   taskNumber: number;
+  projectKey?: string;
+  displayCode?: string;
+  version: number;
   workspaceId: string;
   projectId: string;
   columnId: string;
@@ -134,8 +142,15 @@ export interface Task {
   position: number;
   startDate?: string | null;
   dueDate?: string | null;
+  estimatedMinutes?: number | null;
   estimatedHours?: number | null;
   tags: string[];
+  labels?: Array<{
+    id: string;
+    name: string;
+    normalizedName?: string;
+    color: string;
+  }>;
   isArchived: boolean;
 
   // Validation / Approval
@@ -157,9 +172,24 @@ export interface Task {
   resources?: TaskResource[];
   relationsFrom?: TaskRelation[];
   relationsTo?: TaskRelation[];
+  relations?: Array<{
+    id: string;
+    type: 'BLOCKS' | 'BLOCKED_BY' | 'RELATES_TO';
+    relatedTask: {
+      id: string;
+      title: string;
+      taskNumber: number;
+      displayCode?: string;
+      column?: Column;
+    };
+    createdAt: string;
+  }>;
   timeEntries?: TimeEntry[];
   comments?: Comment[];
   activities?: Activity[];
+  attachments?: Attachment[];
+  customFields?: TaskCustomFieldValue[];
+  customFieldValues?: TaskCustomFieldValue[];
   completedSubtasks?: number;
   totalSubtasks?: number;
   subtaskProgress?: number;
@@ -205,6 +235,7 @@ export interface Notification {
   content: string;
   type: string;
   isRead: boolean;
+  archivedAt?: string | null;
   createdAt: string;
   task?: {
     id: string;
@@ -226,3 +257,114 @@ export interface DashboardData {
   upcomingTasks: Task[];
   activities: Activity[];
 }
+
+export interface TaskPublicDTO {
+  taskId: string;
+  title: string;
+  description?: string | null;
+  status?: string;
+  priority?: string;
+  startDate?: string | null;
+  dueDate?: string | null;
+  checklist?: Array<{ id: string; title: string; completed: boolean }>;
+  resources?: Array<{ id: string; title: string; url: string; type: string }>;
+  customFields?: Array<{ name: string; value: string }>;
+  publicContentUpdatedAt: string;
+}
+
+export interface ShareManagementDTO {
+  id: string;
+  taskId: string;
+  expiresAt: string;
+  revokedAt?: string | null;
+  createdAt: string;
+  createdBy: { type: string; id: string; name?: string };
+  sections: {
+    showStatus: boolean;
+    showPriority: boolean;
+    showDates: boolean;
+    showChecklist: boolean;
+  };
+}
+
+export interface ShareIssuedDTO {
+  shareId: string;
+  url: string;
+  pin: string;
+  expiresAt: string;
+}
+
+export interface Label {
+  id: string;
+  workspaceId: string;
+  name: string;
+  normalizedName: string;
+  color: string;
+  taskCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateShareInput {
+  expiresInDays?: number;
+  showDescription?: boolean;
+  showSubtasks?: boolean;
+  showResources?: boolean;
+  showAttachments?: boolean;
+  showCustomFields?: boolean;
+  selectedResourceIds?: string[];
+  selectedAttachmentIds?: string[];
+  selectedCustomFieldIds?: string[];
+}
+
+export interface Attachment {
+  id: string;
+  taskId: string;
+  commentId?: string | null;
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
+  hashSha256: string;
+  downloadUrl?: string;
+  uploadedById: string;
+  createdAt: string;
+}
+
+export interface CustomFieldOption {
+  id: string;
+  label: string;
+  color?: string | null;
+}
+
+export interface CustomField {
+  id: string;
+  projectId: string;
+  name: string;
+  type: 'text' | 'number' | 'date' | 'select';
+  options?: CustomFieldOption[];
+  isPublicEligible: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskCustomFieldValue {
+  fieldId: string;
+  fieldName: string;
+  type: 'text' | 'number' | 'date' | 'select';
+  value: any;
+  displayValue: any;
+  options?: CustomFieldOption[];
+  isPublicEligible: boolean;
+}
+
+export interface TransferPreviewData {
+  taskId: string;
+  currentProject: { id: string; name: string; key: string };
+  targetProject: { id: string; name: string; key: string };
+  fromDisplayCode: string;
+  toDisplayCode: string;
+  columnsAvailable: Array<{ id: string; name: string }>;
+  relationsToSever: Array<{ id: string; targetTaskId: string; type: string }>;
+  activeSharesToRevokeCount: number;
+}
+

@@ -61,7 +61,7 @@ export const ProjectsSidebarDrawer: React.FC<Props> = ({ onClose }) => {
   // Determine which project is active from the URL path
   useEffect(() => {
     const match = pathname.match(/\/projects\/([a-zA-Z0-9_-]+)/);
-    if (match && !['inbox', 'my-tasks', 'members'].includes(match[1])) {
+    if (match && !['inbox', 'my-tasks', 'members', 'tasks'].includes(match[1])) {
       setExpandedProjectId(match[1]);
     }
   }, [pathname]);

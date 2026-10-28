@@ -122,7 +122,17 @@ import ProjectsInboxPage from '@/pages/projects/ProjectsInboxPage';
 import ProjectsMyTasksPage from '@/pages/projects/ProjectsMyTasksPage';
 import WorkspaceMembersPage from '@/pages/projects/WorkspaceMembersPage';
 import ProjectDetailsPage from '@/pages/projects/ProjectDetailsPage';
-import PublicTaskApprovalPage from '@/pages/projects/public/PublicTaskApprovalPage';
+import TaskDetailsPage from '@/pages/projects/TaskDetailsPage';
+import PublicTaskSharePage from '@/pages/projects/public/PublicTaskSharePage';
+
+// Páginas do módulo financeiro (jprOS Finance Submodule)
+import FinanceDashboardPage from '@/pages/finance/FinanceDashboardPage';
+import FinanceTransactionsPage from '@/pages/finance/FinanceTransactionsPage';
+import FinancePayablesPage from '@/pages/finance/FinancePayablesPage';
+import FinanceReceivablesPage from '@/pages/finance/FinanceReceivablesPage';
+import FinanceReconciliationPage from '@/pages/finance/FinanceReconciliationPage';
+import FinanceReportsPage from '@/pages/finance/FinanceReportsPage';
+import FinanceSettingsPage from '@/pages/finance/FinanceSettingsPage';
 
 // Outras páginas
 import NotFound from '@/pages/NotFound';
@@ -435,12 +445,12 @@ const AppRouter = () => {
             }
           />
 
-          {/* Public Task Validation & Approval Route */}
+          {/* Public Secure Task Share Route (Phase 2 - Read-Only with PIN) */}
           <Route
             path="/p/task/:token"
             element={
               <PublicRoute>
-                <PublicTaskApprovalPage />
+                <PublicTaskSharePage />
               </PublicRoute>
             }
           />
@@ -1556,6 +1566,19 @@ const AppRouter = () => {
               </PrivateRoute>
             }
           />
+          {/* Canonical Task Direct Route (E3.9-a) */}
+          <Route
+            path="/projects/tasks/:taskId"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <TaskDetailsPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/projects/:projectId"
             element={
@@ -1575,6 +1598,92 @@ const AppRouter = () => {
                 <CustomerRoute>
                   <MainLayout>
                     <ProjectDetailsPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+
+          {/* Finance Routes (jprOS Finance Submodule) */}
+          <Route
+            path="/finance"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <FinanceDashboardPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/finance/transactions"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <FinanceTransactionsPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/finance/payables"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <FinancePayablesPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/finance/receivables"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <FinanceReceivablesPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/finance/reconciliation"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <FinanceReconciliationPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/finance/reports"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <FinanceReportsPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/finance/settings"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <FinanceSettingsPage />
                   </MainLayout>
                 </CustomerRoute>
               </PrivateRoute>

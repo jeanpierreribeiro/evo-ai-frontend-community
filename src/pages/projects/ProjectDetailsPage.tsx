@@ -200,6 +200,7 @@ export const ProjectDetailsPage: React.FC = () => {
 
         {view === 'backlog' && (
           <BacklogView
+            project={project}
             columns={columns}
             tasks={tasks}
             onTaskClick={handleTaskClick}

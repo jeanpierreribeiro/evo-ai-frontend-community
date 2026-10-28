@@ -4,9 +4,9 @@ import {
   Calendar,
   CheckSquare,
   MessageSquare,
-  ShieldCheck,
-  AlertCircle,
   Paperclip,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import type { Column, Task, Priority } from '@/types/projects';
 import { projectsService } from '@/services/projects/projectsService';
@@ -30,6 +30,7 @@ const priorityConfig: Record<Priority, { label: string; dot: string }> = {
 };
 
 export const KanbanView: React.FC<Props> = ({
+  projectId,
   columns,
   tasks,
   onTaskClick,
@@ -38,6 +39,36 @@ export const KanbanView: React.FC<Props> = ({
 }) => {
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [dragOverColumnId, setDragOverColumnId] = useState<string | null>(null);
+  const [moveError, setMoveError] = useState<string | null>(null);
+  const [isReordering, setIsReordering] = useState(false);
+
+  const handleMoveColumn = async (index: number, direction: 'left' | 'right') => {
+    const targetIndex = direction === 'left' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= columns.length) return;
+
+    const newCols = [...columns];
+    const temp = newCols[index];
+    newCols[index] = newCols[targetIndex];
+    newCols[targetIndex] = temp;
+
+    const payload = newCols.map((c, pos) => ({ id: c.id, position: (pos + 1) * 10 }));
+
+    setIsReordering(true);
+    setMoveError(null);
+    try {
+      await projectsService.reorderColumns(projectId, payload);
+      onTasksChange();
+    } catch (err: any) {
+      console.error('Erro ao reordenar colunas:', err);
+      setMoveError(
+        err.response?.data?.message ||
+          'Falha ao reordenar colunas. Apenas administradores podem alterar a ordem do fluxo.'
+      );
+      setTimeout(() => setMoveError(null), 5000);
+    } finally {
+      setIsReordering(false);
+    }
+  };
 
   const handleDragStart = (e: React.DragEvent, taskId: string) => {
     e.dataTransfer.setData('text/plain', taskId);
@@ -60,6 +91,7 @@ export const KanbanView: React.FC<Props> = ({
   const handleDrop = async (e: React.DragEvent, targetColumnId: string) => {
     e.preventDefault();
     setDragOverColumnId(null);
+    setMoveError(null);
     const taskId = e.dataTransfer.getData('text/plain') || draggedTaskId;
     if (!taskId) return;
 
@@ -67,19 +99,35 @@ export const KanbanView: React.FC<Props> = ({
     if (!task || task.columnId === targetColumnId) return;
 
     try {
-      // Move task to target column
+      // Move task to target column com reordenação transacional
       await projectsService.moveTask(taskId, targetColumnId, 9999);
       onTasksChange();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erro ao mover tarefa:', err);
+      // Rollback visual (E3.5-b / T11): restaura estado anterior renderizando dados reais do servidor
+      setMoveError('Não foi possível mover a tarefa. A posição anterior foi restaurada.');
+      onTasksChange();
+      setTimeout(() => setMoveError(null), 5000);
     } finally {
       setDraggedTaskId(null);
     }
   };
 
   return (
-    <div className="flex-1 overflow-x-auto p-4 flex items-start gap-4 select-none min-h-[calc(100vh-180px)]">
-      {columns.map((column) => {
+    <div className="flex-1 flex flex-col min-h-[calc(100vh-180px)]">
+      {moveError && (
+        <div className="mx-4 mt-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs flex items-center justify-between">
+          <span>{moveError}</span>
+          <button
+            onClick={() => setMoveError(null)}
+            className="text-muted-foreground hover:text-foreground font-bold px-1"
+          >
+            ×
+          </button>
+        </div>
+      )}
+      <div className="flex-1 overflow-x-auto p-4 flex items-start gap-4 select-none">
+      {columns.map((column, index) => {
         const columnTasks = tasks
           .filter((t) => t.columnId === column.id)
           .sort((a, b) => a.position - b.position);
@@ -99,26 +147,49 @@ export const KanbanView: React.FC<Props> = ({
           >
             {/* Column Header */}
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/60">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 min-w-0">
                 <div
-                  className="w-2.5 h-2.5 rounded-full"
+                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                   style={{ backgroundColor: column.color || '#94a3b8' }}
                 />
-                <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-foreground uppercase tracking-wider truncate">
                   {column.name}
                 </h3>
-                <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-muted text-muted-foreground rounded-full">
+                <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-muted text-muted-foreground rounded-full flex-shrink-0">
                   {columnTasks.length}
                 </span>
               </div>
 
-              <button
-                onClick={() => onOpenCreateTask(column.id)}
-                className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-muted transition-colors"
-                title="Adicionar tarefa"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-0.5 flex-shrink-0">
+                {/* Column Reordering buttons */}
+                <button
+                  type="button"
+                  onClick={() => handleMoveColumn(index, 'left')}
+                  disabled={index === 0 || isReordering}
+                  className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-20 disabled:cursor-not-allowed rounded hover:bg-muted transition-colors"
+                  title="Mover coluna para a esquerda"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleMoveColumn(index, 'right')}
+                  disabled={index === columns.length - 1 || isReordering}
+                  className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-20 disabled:cursor-not-allowed rounded hover:bg-muted transition-colors"
+                  title="Mover coluna para a direita"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onOpenCreateTask(column.id)}
+                  className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-muted transition-colors ml-0.5"
+                  title="Adicionar tarefa nesta coluna"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             {/* Cards List */}
@@ -140,29 +211,13 @@ export const KanbanView: React.FC<Props> = ({
                       draggedTaskId === task.id && 'opacity-40 scale-95'
                     )}
                   >
-                    {/* Top Row: Ticket ID + Priority + Approval Badge */}
+                    {/* Top Row: Ticket ID + Priority */}
                     <div className="flex items-center justify-between gap-1 text-[11px]">
-                      <span className="font-bold text-muted-foreground">#{task.taskNumber}</span>
+                      <span className="font-bold text-muted-foreground font-mono">
+                        {task.displayCode || `#${task.taskNumber}`}
+                      </span>
 
                       <div className="flex items-center gap-1.5">
-                        {task.approvalStatus === 'APPROVED' && (
-                          <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-medium">
-                            <ShieldCheck className="w-3 h-3" />
-                            Aprovado
-                          </span>
-                        )}
-                        {task.approvalStatus === 'PENDING' && (
-                          <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-medium">
-                            Em Validação
-                          </span>
-                        )}
-                        {task.approvalStatus === 'CHANGES_REQUESTED' && (
-                          <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-500/10 text-red-600 dark:text-red-400 text-[10px] font-medium">
-                            <AlertCircle className="w-3 h-3" />
-                            Ajustes
-                          </span>
-                        )}
-
                         {prio.dot && (
                           <span
                             className={cn('w-2 h-2 rounded-full', prio.dot)}
@@ -266,6 +321,7 @@ export const KanbanView: React.FC<Props> = ({
           </div>
         );
       })}
+      </div>
     </div>
   );
 };

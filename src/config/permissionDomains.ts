@@ -56,7 +56,7 @@ export const PERMISSION_DOMAINS: PermissionDomain[] = [
   {
     key: 'admin',
     labelKey: 'domains.admin',
-    resources: ['users', 'teams', 'roles', 'accounts', 'access_tokens', 'templates', 'profiles'],
+    resources: ['users', 'teams', 'roles', 'accounts', 'access_tokens', 'templates', 'profiles', 'project_workspaces'],
   },
 ];
 

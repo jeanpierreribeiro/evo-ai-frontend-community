@@ -23,6 +23,7 @@ for file in $(find "$HTML_DIR" -name '*.js' -type f); do
   [ -n "$VITE_EVOFLOW_API_URL" ] && sed -i "s|VITE_EVOFLOW_API_URL_PLACEHOLDER|${VITE_EVOFLOW_API_URL}|g" "$file"
   [ -n "$VITE_SCHEDULING_API_URL" ] && sed -i "s|VITE_SCHEDULING_API_URL_PLACEHOLDER|${VITE_SCHEDULING_API_URL}|g" "$file"
   [ -n "$VITE_PROJECTS_API_URL" ] && sed -i "s|VITE_PROJECTS_API_URL_PLACEHOLDER|${VITE_PROJECTS_API_URL}|g" "$file"
+  [ -n "$VITE_FINANCE_API_URL" ] && sed -i "s|VITE_FINANCE_API_URL_PLACEHOLDER|${VITE_FINANCE_API_URL}|g" "$file"
 done
 
 # Configure nginx CSP based on environment (default: development)

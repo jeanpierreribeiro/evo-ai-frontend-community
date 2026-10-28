@@ -1,11 +1,12 @@
 import React from 'react';
 import { Layers, Plus, Calendar, ArrowRight } from 'lucide-react';
 import { Button } from '@evoapi/design-system';
-import type { Column, Task, Priority } from '@/types/projects';
+import type { Project, Column, Task, Priority } from '@/types/projects';
 import { projectsService } from '@/services/projects/projectsService';
 import { cn } from '@/utils/cn';
 
 interface Props {
+  project?: Project | null;
   columns: Column[];
   tasks: Task[];
   onTaskClick: (task: Task) => void;
@@ -22,15 +23,25 @@ const priorityColors: Record<Priority, { label: string; dot: string }> = {
 };
 
 export const BacklogView: React.FC<Props> = ({
+  project,
   columns,
   tasks,
   onTaskClick,
   onTasksChange,
   onOpenCreateTask,
 }) => {
-  const backlogColumn = columns.find((c) => c.name.toLowerCase().includes('backlog')) || columns[0];
-  const targetColumns = columns.filter((c) => c.id !== backlogColumn?.id);
+  // Precedência E3.10-c:
+  // 1. project.backlogColumnId explicitamente configurado nas opções do projeto
+  // 2. Coluna cujo nome contenha 'backlog'
+  // 3. Primeira coluna do projeto
+  const backlogColumn =
+    (project?.backlogColumnId
+      ? columns.find((c) => c.id === project.backlogColumnId)
+      : null) ||
+    columns.find((c) => c.name.toLowerCase().includes('backlog')) ||
+    columns[0];
 
+  const targetColumns = columns.filter((c) => c.id !== backlogColumn?.id);
   const backlogTasks = tasks.filter((t) => t.columnId === backlogColumn?.id);
 
   const handleMoveToColumn = async (e: React.MouseEvent, taskId: string, targetColId: string) => {
@@ -39,27 +50,32 @@ export const BacklogView: React.FC<Props> = ({
       await projectsService.moveTask(taskId, targetColId, 0);
       onTasksChange();
     } catch (err) {
-      console.error('Erro ao mover tarefa:', err);
+      console.error('Erro ao mover tarefa do backlog:', err);
     }
   };
 
   return (
     <div className="flex-1 p-6 max-w-5xl mx-auto overflow-y-auto space-y-4">
-      <div className="flex items-center justify-between pb-2 border-b border-border">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-border gap-4">
         <div>
           <h2 className="text-base font-bold text-foreground flex items-center gap-2">
             <Layers className="w-5 h-5 text-primary" />
             <span>Triagem de Backlog</span>
           </h2>
-          <p className="text-xs text-muted-foreground">
-            Demandas levantadas que aguardam priorização para entrar no fluxo de desenvolvimento.
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Coluna ativa:{' '}
+            <span className="font-semibold text-foreground">
+              {backlogColumn?.name || 'Não definida'}
+            </span>
+            {project?.backlogColumnId && ' (configurada nas opções do projeto)'}
+            {' — '}Demandas que aguardam priorização para entrar no fluxo de sprint.
           </p>
         </div>
 
         <Button
           onClick={() => onOpenCreateTask(backlogColumn?.id)}
           size="sm"
-          className="flex items-center gap-1.5"
+          className="flex items-center gap-1.5 text-xs"
         >
           <Plus className="w-4 h-4" />
           <span>Nova Ideia / Demanda</span>
@@ -71,13 +87,13 @@ export const BacklogView: React.FC<Props> = ({
           <Layers className="w-8 h-8 mx-auto text-muted-foreground/60 mb-2" />
           <p className="text-sm font-medium text-foreground">Backlog Vazio!</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Todas as demandas já foram priorizadas para as colunas ativas.
+            Todas as demandas da coluna "{backlogColumn?.name}" já foram priorizadas para as colunas ativas.
           </p>
         </div>
       ) : (
         <div className="space-y-2">
           {backlogTasks.map((task) => {
-            const prio = priorityColors[task.priority];
+            const prio = priorityColors[task.priority] || priorityColors.NONE;
 
             return (
               <div
@@ -87,8 +103,8 @@ export const BacklogView: React.FC<Props> = ({
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className={cn('w-2.5 h-2.5 rounded-full flex-shrink-0', prio.dot)} />
-                  <span className="text-xs font-bold text-muted-foreground">
-                    #{task.taskNumber}
+                  <span className="text-xs font-bold font-mono text-muted-foreground flex-shrink-0">
+                    {task.displayCode || `#${task.taskNumber}`}
                   </span>
                   <span className="text-xs font-semibold text-foreground truncate">
                     {task.title}
@@ -98,21 +114,22 @@ export const BacklogView: React.FC<Props> = ({
                 <div className="flex items-center gap-3 flex-shrink-0">
                   {task.dueDate && (
                     <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                      <Calendar className="w-3.5 h-3.5" />
+                      <Calendar className="w-3 h-3" />
                       {new Date(task.dueDate).toLocaleDateString('pt-BR')}
                     </span>
                   )}
 
-                  {/* Move to next column quick button */}
-                  <div className="flex items-center gap-1">
-                    {targetColumns.slice(0, 2).map((col) => (
+                  {/* Quick move buttons into other workflow columns */}
+                  <div className="flex items-center gap-1.5">
+                    {targetColumns.slice(0, 3).map((col) => (
                       <button
                         key={col.id}
                         onClick={(e) => handleMoveToColumn(e, task.id, col.id)}
-                        className="px-2 py-1 rounded text-[10px] font-medium bg-muted hover:bg-primary/20 hover:text-primary transition-colors flex items-center gap-1"
+                        className="px-2 py-1 text-[10px] font-medium rounded border border-border/80 bg-background hover:bg-primary/10 hover:border-primary/40 text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                        title={`Mover para "${col.name}"`}
                       >
-                        <span>Mover p/ {col.name}</span>
-                        <ArrowRight className="w-3 h-3" />
+                        <span>{col.name}</span>
+                        <ArrowRight className="w-2.5 h-2.5" />
                       </button>
                     ))}
                   </div>
