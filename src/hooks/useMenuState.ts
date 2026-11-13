@@ -213,24 +213,13 @@ export function useMenuState(
           };
         });
       } else {
-        // If href is not '#', navigate to the page (submenu will open automatically if route matches)
-        // Always close any open submenu when navigating to a different menu item
-        setState(prev => {
-          // If navigating to a different menu item, close the current submenu
-          if (prev.activeSubmenu && prev.activeSubmenu.name !== item.name) {
-            return {
-              activeSubmenu: null,
-              activeMenu: item.name,
-            };
-          }
-          // Otherwise, keep current state but update activeMenu
-          return {
-            activeSubmenu: prev.activeSubmenu,
-            activeMenu: item.name,
-          };
+        // If href is not '#', navigate to the page and open this item's submenu
+        setState({
+          activeSubmenu: item,
+          activeMenu: item.name,
         });
 
-        // Reset manual flag so auto-detection can work after navigation
+        // Reset manual flag so auto-detection and submenu display work properly
         isManualSubmenuOpenRef.current = false;
 
         // Close mobile menu if needed

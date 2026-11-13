@@ -13,6 +13,7 @@ import {
   GitGraph,
   Calendar,
   Layers,
+  FolderKanban,
 } from 'lucide-react';
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@evoapi/design-system';
 import { cn } from '@/utils/cn';
@@ -83,33 +84,58 @@ export const ProjectsSidebarDrawer: React.FC<Props> = ({ onClose }) => {
 
   return (
     <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground border-r border-sidebar-border w-64 select-none">
-      {/* Drawer Header: Workspace Selector & Close */}
-      <div className="flex items-center justify-between p-3 border-b border-sidebar-border">
-        {/* Workspace Dropdown Trigger */}
-        <div className="relative flex-1 min-w-0 mr-2">
+      {/* Drawer Header: Padronizado idêntico ao Agenda e Agentes de IA */}
+      <div className="flex items-center gap-3 p-4 border-b border-sidebar-border">
+        <FolderKanban className="h-5 w-5 text-primary" />
+        <div className="flex-1 min-w-0">
+          <h3 id="flyout-title" className="font-semibold text-sidebar-foreground truncate">
+            Projetos
+          </h3>
+        </div>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-label="Fechar submenu"
+              onClick={onClose}
+              className="h-8 w-8 p-0 hover:bg-sidebar-accent text-sidebar-foreground hover:text-sidebar-foreground"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="left">
+            <p>Fechar submenu</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+
+      {/* Workspace Selector Bar */}
+      <div className="px-3 pt-3 pb-1">
+        <div className="relative">
           <button
             onClick={() => setIsWorkspaceDropdownOpen(!isWorkspaceDropdownOpen)}
-            className="flex items-center gap-2 w-full p-1.5 rounded-lg hover:bg-sidebar-accent text-left transition-colors"
+            className="flex items-center gap-2.5 w-full p-2 rounded-lg bg-accent/40 hover:bg-accent/80 border border-sidebar-border/60 text-left transition-colors"
           >
             <div
-              className="w-6 h-6 rounded-md flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+              className="w-6 h-6 rounded-md flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-sm"
               style={{ backgroundColor: activeWorkspace?.color || '#3b82f6' }}
             >
               {activeWorkspace?.name?.charAt(0).toUpperCase() || 'W'}
             </div>
             <div className="flex-1 min-w-0">
-              <span className="block text-xs font-semibold text-sidebar-foreground truncate">
+              <span className="block text-xs font-semibold text-sidebar-foreground truncate leading-tight">
                 {activeWorkspace?.name || 'Selecione a Empresa'}
               </span>
-              <span className="block text-[10px] text-muted-foreground truncate">Workspace</span>
+              <span className="block text-[11px] text-muted-foreground truncate leading-tight mt-0.5">Workspace</span>
             </div>
-            <ChevronDown className={cn('w-3.5 h-3.5 text-muted-foreground transition-transform duration-150', isWorkspaceDropdownOpen && 'rotate-180')} />
+            <ChevronDown className={cn('w-4 h-4 text-muted-foreground transition-transform duration-150', isWorkspaceDropdownOpen && 'rotate-180')} />
           </button>
 
           {/* Workspace Dropdown Menu */}
           {isWorkspaceDropdownOpen && (
-            <div className="absolute top-full left-0 mt-1 w-60 bg-popover text-popover-foreground border border-border rounded-lg shadow-xl z-50 py-1 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-100">
-              <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+            <div className="absolute top-full left-0 mt-1 w-full bg-popover text-popover-foreground border border-border rounded-lg shadow-xl z-50 py-1 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-100">
+              <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Suas Empresas / Workspaces
               </div>
               {workspaces.map((w) => (
@@ -117,7 +143,7 @@ export const ProjectsSidebarDrawer: React.FC<Props> = ({ onClose }) => {
                   key={w.id}
                   onClick={() => handleSelectWorkspace(w)}
                   className={cn(
-                    'w-full flex items-center gap-2.5 px-3 py-2 text-xs text-left hover:bg-accent transition-colors',
+                    'w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-accent transition-colors',
                     w.id === activeWorkspace?.id && 'bg-primary/10 text-primary font-medium'
                   )}
                 >
@@ -135,95 +161,78 @@ export const ProjectsSidebarDrawer: React.FC<Props> = ({ onClose }) => {
                     setIsWorkspaceDropdownOpen(false);
                     setIsCreateWorkspaceOpen(true);
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-primary hover:bg-accent transition-colors font-medium"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-accent transition-colors font-medium"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-4 h-4" />
                   <span>Nova Empresa</span>
                 </button>
               </div>
             </div>
           )}
         </div>
-
-        {/* Close Button */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-7 w-7 p-0 hover:bg-sidebar-accent text-sidebar-foreground"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="left">
-            <p>Fechar menu</p>
-          </TooltipContent>
-        </Tooltip>
       </div>
 
       {/* Navigation Body */}
-      <div className="flex-1 overflow-y-auto px-2 py-3 space-y-4">
+      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
         {/* Global Company Views */}
-        <div className="space-y-0.5">
+        <div className="space-y-1">
           <Link
             to="/projects"
             className={cn(
-              'flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
+              'flex items-center gap-3 px-3 py-2.5 rounded-md transition-all text-sm font-medium',
               isGlobalActive('/projects')
                 ? 'bg-primary/10 text-primary font-semibold'
-                : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
             )}
           >
-            <Home className="w-4 h-4" />
-            <span>Início (Dashboard)</span>
+            <Home className={cn('flex-shrink-0 h-4 w-4', isGlobalActive('/projects') && 'text-primary')} />
+            <span className="flex-1">Início (Dashboard)</span>
           </Link>
 
           <Link
             to="/projects/inbox"
             className={cn(
-              'flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
+              'flex items-center gap-3 px-3 py-2.5 rounded-md transition-all text-sm font-medium',
               isGlobalActive('/projects/inbox')
                 ? 'bg-primary/10 text-primary font-semibold'
-                : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
             )}
           >
-            <Inbox className="w-4 h-4" />
-            <span>Caixa de Entrada</span>
+            <Inbox className={cn('flex-shrink-0 h-4 w-4', isGlobalActive('/projects/inbox') && 'text-primary')} />
+            <span className="flex-1">Caixa de Entrada</span>
           </Link>
 
           <Link
             to="/projects/my-tasks"
             className={cn(
-              'flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
+              'flex items-center gap-3 px-3 py-2.5 rounded-md transition-all text-sm font-medium',
               isGlobalActive('/projects/my-tasks')
                 ? 'bg-primary/10 text-primary font-semibold'
-                : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
             )}
           >
-            <CheckSquare className="w-4 h-4" />
-            <span>Minhas Tarefas</span>
+            <CheckSquare className={cn('flex-shrink-0 h-4 w-4', isGlobalActive('/projects/my-tasks') && 'text-primary')} />
+            <span className="flex-1">Minhas Tarefas</span>
           </Link>
 
           <Link
             to="/projects/members"
             className={cn(
-              'flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
+              'flex items-center gap-3 px-3 py-2.5 rounded-md transition-all text-sm font-medium',
               isGlobalActive('/projects/members')
                 ? 'bg-primary/10 text-primary font-semibold'
-                : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
             )}
           >
-            <Users2 className="w-4 h-4" />
-            <span>Membros</span>
+            <Users2 className={cn('flex-shrink-0 h-4 w-4', isGlobalActive('/projects/members') && 'text-primary')} />
+            <span className="flex-1">Membros</span>
           </Link>
         </div>
 
         {/* Projects Section */}
-        <div className="pt-2 border-t border-sidebar-border">
-          <div className="flex items-center justify-between px-2 mb-1">
-            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+        <div className="pt-3 border-t border-sidebar-border">
+          <div className="flex items-center justify-between px-3 mb-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Projetos ({projects.length})
             </span>
             <button
@@ -231,20 +240,20 @@ export const ProjectsSidebarDrawer: React.FC<Props> = ({ onClose }) => {
               className="p-1 text-muted-foreground hover:text-primary rounded hover:bg-sidebar-accent transition-colors"
               title="Novo Projeto"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
             </button>
           </div>
 
           {loadingProjects && (
-            <div className="text-xs text-muted-foreground px-2 py-1">Carregando projetos...</div>
+            <div className="text-sm text-muted-foreground px-3 py-2">Carregando projetos...</div>
           )}
 
           {!loadingProjects && projects.length === 0 && (
-            <div className="text-center p-3 text-xs text-muted-foreground border border-dashed border-sidebar-border rounded-lg">
+            <div className="text-center p-3 text-sm text-muted-foreground border border-dashed border-sidebar-border rounded-lg mx-1">
               Nenhum projeto ainda.
               <button
                 onClick={() => setIsCreateProjectOpen(true)}
-                className="block text-primary hover:underline mx-auto mt-1"
+                className="block text-primary hover:underline mx-auto mt-1 font-medium"
               >
                 + Criar primeiro
               </button>
@@ -263,20 +272,20 @@ export const ProjectsSidebarDrawer: React.FC<Props> = ({ onClose }) => {
                       navigate(`/projects/${project.id}/kanban`);
                     }}
                     className={cn(
-                      'flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-colors group',
+                      'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-pointer transition-all group',
                       pathname.startsWith(`/projects/${project.id}`)
                         ? 'bg-sidebar-accent text-sidebar-foreground'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                     )}
                   >
                     <div
                       className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                       style={{ backgroundColor: project.color || '#6366f1' }}
                     />
-                    <span className="truncate flex-1 font-medium">{project.name}</span>
+                    <span className="truncate flex-1">{project.name}</span>
                     <ChevronDown
                       className={cn(
-                        'w-3 h-3 text-muted-foreground transition-transform duration-150',
+                        'w-3.5 h-3.5 text-muted-foreground transition-transform duration-150',
                         isExpanded && 'rotate-180'
                       )}
                     />
@@ -288,65 +297,65 @@ export const ProjectsSidebarDrawer: React.FC<Props> = ({ onClose }) => {
                       <Link
                         to={`/projects/${project.id}/kanban`}
                         className={cn(
-                          'flex items-center gap-2 px-2 py-1 rounded text-xs transition-colors',
+                          'flex items-center gap-2.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
                           isProjectViewActive(project.id, 'kanban')
                             ? 'bg-primary/10 text-primary font-semibold'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                         )}
                       >
-                        <Kanban className="w-3.5 h-3.5" />
+                        <Kanban className="w-4 h-4 flex-shrink-0" />
                         <span>Quadro (Kanban)</span>
                       </Link>
 
                       <Link
                         to={`/projects/${project.id}/list`}
                         className={cn(
-                          'flex items-center gap-2 px-2 py-1 rounded text-xs transition-colors',
+                          'flex items-center gap-2.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
                           isProjectViewActive(project.id, 'list')
                             ? 'bg-primary/10 text-primary font-semibold'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                         )}
                       >
-                        <List className="w-3.5 h-3.5" />
+                        <List className="w-4 h-4 flex-shrink-0" />
                         <span>Lista</span>
                       </Link>
 
                       <Link
                         to={`/projects/${project.id}/gantt`}
                         className={cn(
-                          'flex items-center gap-2 px-2 py-1 rounded text-xs transition-colors',
+                          'flex items-center gap-2.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
                           isProjectViewActive(project.id, 'gantt')
                             ? 'bg-primary/10 text-primary font-semibold'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                         )}
                       >
-                        <GitGraph className="w-3.5 h-3.5" />
+                        <GitGraph className="w-4 h-4 flex-shrink-0" />
                         <span>Gráfico de Gantt</span>
                       </Link>
 
                       <Link
                         to={`/projects/${project.id}/calendar`}
                         className={cn(
-                          'flex items-center gap-2 px-2 py-1 rounded text-xs transition-colors',
+                          'flex items-center gap-2.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
                           isProjectViewActive(project.id, 'calendar')
                             ? 'bg-primary/10 text-primary font-semibold'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                         )}
                       >
-                        <Calendar className="w-3.5 h-3.5" />
+                        <Calendar className="w-4 h-4 flex-shrink-0" />
                         <span>Calendário</span>
                       </Link>
 
                       <Link
                         to={`/projects/${project.id}/backlog`}
                         className={cn(
-                          'flex items-center gap-2 px-2 py-1 rounded text-xs transition-colors',
+                          'flex items-center gap-2.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
                           isProjectViewActive(project.id, 'backlog')
                             ? 'bg-primary/10 text-primary font-semibold'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                         )}
                       >
-                        <Layers className="w-3.5 h-3.5" />
+                        <Layers className="w-4 h-4 flex-shrink-0" />
                         <span>Backlog</span>
                       </Link>
                     </div>

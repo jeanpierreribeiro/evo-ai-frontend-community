@@ -16,6 +16,7 @@ import { useWorkspaceStore } from '@/store/workspaceStore';
 import { projectsService } from '@/services/projects/projectsService';
 import type { DashboardData } from '@/types/projects';
 import { CreateProjectModal } from '@/components/projects/CreateProjectModal';
+import { CreateWorkspaceModal } from '@/components/projects/CreateWorkspaceModal';
 
 export const ProjectsHomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export const ProjectsHomePage: React.FC = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
+  const [isCreateWorkspaceOpen, setIsCreateWorkspaceOpen] = useState(false);
   const [activityLimit, setActivityLimit] = useState(7);
 
   useEffect(() => {
@@ -30,12 +32,19 @@ export const ProjectsHomePage: React.FC = () => {
   }, [fetchWorkspaces]);
 
   useEffect(() => {
-    if (!activeWorkspace?.id) return;
+    if (!activeWorkspace?.id) {
+      setLoading(false);
+      setData(null);
+      return;
+    }
     setLoading(true);
     projectsService
       .getDashboard(activeWorkspace.id)
       .then((res) => setData(res))
-      .catch((err) => console.error('Erro ao carregar dashboard de projetos:', err))
+      .catch((err) => {
+        console.error('Erro ao carregar dashboard de projetos:', err);
+        setData(null);
+      })
       .finally(() => setLoading(false));
   }, [activeWorkspace?.id]);
 
@@ -56,10 +65,15 @@ export const ProjectsHomePage: React.FC = () => {
           </p>
         </div>
 
-        {activeWorkspace && (
+        {activeWorkspace ? (
           <Button onClick={() => setIsCreateProjectOpen(true)} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
             <span>Novo Projeto</span>
+          </Button>
+        ) : (
+          <Button onClick={() => setIsCreateWorkspaceOpen(true)} className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            <span>Criar Workspace</span>
           </Button>
         )}
       </div>
@@ -69,8 +83,14 @@ export const ProjectsHomePage: React.FC = () => {
           Carregando indicadores...
         </div>
       ) : !data ? (
-        <div className="text-center p-12 border border-dashed border-border rounded-xl">
+        <div className="text-center p-12 border border-dashed border-border rounded-xl space-y-4">
           <p className="text-muted-foreground text-sm">Selecione ou crie um workspace para começar.</p>
+          {!activeWorkspace && (
+            <Button onClick={() => setIsCreateWorkspaceOpen(true)} className="flex items-center gap-2 mx-auto">
+              <Plus className="w-4 h-4" />
+              <span>Criar Workspace</span>
+            </Button>
+          )}
         </div>
       ) : (
         <>
@@ -322,6 +342,11 @@ export const ProjectsHomePage: React.FC = () => {
           }}
         />
       )}
+
+      <CreateWorkspaceModal
+        isOpen={isCreateWorkspaceOpen}
+        onClose={() => setIsCreateWorkspaceOpen(false)}
+      />
     </div>
   );
 };
