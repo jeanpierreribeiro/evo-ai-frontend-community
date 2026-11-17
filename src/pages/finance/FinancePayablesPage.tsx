@@ -43,13 +43,14 @@ export const FinancePayablesPage: React.FC = () => {
           type: 'PAYABLE',
           status: statusFilter || undefined,
           pageSize: 50,
-        }),
-        financeService.listBankAccounts(),
-        financeService.listPaymentMethods(),
+        }).catch(() => ({ data: [] })),
+        financeService.listBankAccounts().catch(() => []),
+        financeService.listPaymentMethods().catch(() => []),
       ]);
-      setSchedules(schRes.data);
-      setBankAccounts(accRes);
-      setPaymentMethods(paymRes);
+      const safeSchedules = Array.isArray(schRes?.data) ? schRes.data : (Array.isArray(schRes) ? schRes : []);
+      setSchedules(safeSchedules);
+      setBankAccounts(Array.isArray(accRes) ? accRes : (accRes?.data || []));
+      setPaymentMethods(Array.isArray(paymRes) ? paymRes : (paymRes?.data || []));
     } catch (err) {
       console.error('Erro ao listar títulos a pagar:', err);
     } finally {

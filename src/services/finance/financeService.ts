@@ -246,22 +246,22 @@ export const financeService = {
   // --- Auxiliary Entities ---
   async listPersons(): Promise<Person[]> {
     const { data } = await financeApi.get('/persons');
-    return data;
+    return Array.isArray(data) ? data : (data?.data || []);
   },
 
   async listChartOfAccounts(): Promise<ChartOfAccount[]> {
     const { data } = await financeApi.get('/chart-of-accounts');
-    return data;
+    return Array.isArray(data) ? data : (data?.data || []);
   },
 
   async listCostCenters(): Promise<CostCenter[]> {
     const { data } = await financeApi.get('/cost-centers');
-    return data;
+    return Array.isArray(data) ? data : (data?.data || []);
   },
 
   async listPaymentMethods(): Promise<PaymentMethod[]> {
     const { data } = await financeApi.get('/payment-methods');
-    return data;
+    return Array.isArray(data) ? data : (data?.data || []);
   },
 
   async getCompanySettings(): Promise<any> {

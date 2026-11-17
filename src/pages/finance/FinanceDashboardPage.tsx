@@ -30,15 +30,15 @@ export const FinanceDashboardPage: React.FC = () => {
       const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
 
       const [accountsRes, payablesRes, receivablesRes, dreRes] = await Promise.all([
-        financeService.listBankAccounts(),
-        financeService.listSchedules({ type: 'PAYABLE', status: 'PENDING', pageSize: 5 }),
-        financeService.listSchedules({ type: 'RECEIVABLE', status: 'PENDING', pageSize: 5 }),
-        financeService.getDre(firstDay, lastDay, 'cash'),
+        financeService.listBankAccounts().catch(() => []),
+        financeService.listSchedules({ type: 'PAYABLE', status: 'PENDING', pageSize: 5 }).catch(() => ({ data: [] })),
+        financeService.listSchedules({ type: 'RECEIVABLE', status: 'PENDING', pageSize: 5 }).catch(() => ({ data: [] })),
+        financeService.getDre(firstDay, lastDay, 'cash').catch(() => null),
       ]);
 
-      setBankAccounts(accountsRes);
-      setPendingPayables(payablesRes.data);
-      setPendingReceivables(receivablesRes.data);
+      setBankAccounts(Array.isArray(accountsRes) ? accountsRes : (accountsRes?.data || []));
+      setPendingPayables(Array.isArray(payablesRes?.data) ? payablesRes.data : []);
+      setPendingReceivables(Array.isArray(receivablesRes?.data) ? receivablesRes.data : []);
       setDre(dreRes);
     } catch (err) {
       console.error('Erro ao carregar dados do dashboard financeiro:', err);

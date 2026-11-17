@@ -73,19 +73,20 @@ export const FinanceReceivablesPage: React.FC = () => {
           status: statusFilter || undefined,
           search: searchTerm || undefined,
           pageSize: 50,
-        }),
-        financeService.listBankAccounts(),
-        financeService.listPaymentMethods(),
-        financeService.listPersons(),
-        financeService.listChartOfAccounts(),
-        financeService.listCostCenters(),
+        }).catch(() => ({ data: [] })),
+        financeService.listBankAccounts().catch(() => []),
+        financeService.listPaymentMethods().catch(() => []),
+        financeService.listPersons().catch(() => []),
+        financeService.listChartOfAccounts().catch(() => []),
+        financeService.listCostCenters().catch(() => []),
       ]);
-      setSchedules(schRes.data);
-      setBankAccounts(accRes);
-      setPaymentMethods(paymRes);
-      setPersons(persRes);
-      setChartOfAccounts(coaRes);
-      setCostCenters(ccRes);
+      const safeSchedules = Array.isArray(schRes?.data) ? schRes.data : (Array.isArray(schRes) ? schRes : []);
+      setSchedules(safeSchedules);
+      setBankAccounts(Array.isArray(accRes) ? accRes : (accRes?.data || []));
+      setPaymentMethods(Array.isArray(paymRes) ? paymRes : (paymRes?.data || []));
+      setPersons(Array.isArray(persRes) ? persRes : (persRes?.data || []));
+      setChartOfAccounts(Array.isArray(coaRes) ? coaRes : (coaRes?.data || []));
+      setCostCenters(Array.isArray(ccRes) ? ccRes : (ccRes?.data || []));
     } catch (err) {
       console.error('Erro ao listar títulos a receber:', err);
     } finally {
@@ -323,11 +324,11 @@ export const FinanceReceivablesPage: React.FC = () => {
     totalWithholdingAmount;
 
   // Totais de resumo
-  const totalReceivable = schedules.reduce((sum, s) => sum + parseFloat(s.originalAmount || '0'), 0);
-  const totalPending = schedules
-    .filter((s) => s.status === 'PENDING' || s.status === 'PARTIALLY_PAID')
-    .reduce((sum, s) => sum + (parseFloat(s.originalAmount) - parseFloat(s.settledPrincipal)), 0);
-  const totalReceived = schedules.reduce((sum, s) => sum + parseFloat(s.settledPrincipal || '0'), 0);
+  const totalReceivable = (schedules || []).reduce((sum, s) => sum + parseFloat(s?.originalAmount || '0'), 0);
+  const totalPending = (schedules || [])
+    .filter((s) => s?.status === 'PENDING' || s?.status === 'PARTIALLY_PAID')
+    .reduce((sum, s) => sum + (parseFloat(s?.originalAmount || '0') - parseFloat(s?.settledPrincipal || '0')), 0);
+  const totalReceived = (schedules || []).reduce((sum, s) => sum + parseFloat(s?.settledPrincipal || '0'), 0);
 
   return (
     <div className="flex-1 p-6 space-y-6 max-w-7xl mx-auto overflow-y-auto">
@@ -541,7 +542,7 @@ export const FinanceReceivablesPage: React.FC = () => {
                   className="w-full text-xs px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-800 dark:text-gray-200"
                 >
                   <option value="">Selecione um cliente (ou deixe avulso)...</option>
-                  {persons.map((p) => (
+                  {(persons || []).map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name} {p.documentNumber ? `(${p.documentNumber})` : ''}
                     </option>
