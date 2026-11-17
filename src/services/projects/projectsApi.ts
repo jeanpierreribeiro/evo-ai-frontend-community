@@ -2,7 +2,23 @@ import axios, { InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/store/authStore';
 import apiAuth from '@/services/core/apiAuth';
 
-const rawBaseUrl = import.meta.env.VITE_PROJECTS_API_URL || 'http://localhost:3013';
+const getProjectsBaseUrl = (): string => {
+  const envUrl = import.meta.env.VITE_PROJECTS_API_URL;
+  if (envUrl && envUrl !== 'VITE_PROJECTS_API_URL_PLACEHOLDER') {
+    return envUrl;
+  }
+  // Em produção ou acesso seguro via HTTPS, evita localhost:3013 prevenindo Mixed Content / Network Error
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+    const apiBase = import.meta.env.VITE_API_URL;
+    if (apiBase && apiBase !== 'VITE_API_URL_PLACEHOLDER') {
+      return apiBase;
+    }
+    return window.location.origin;
+  }
+  return 'http://localhost:3013';
+};
+
+const rawBaseUrl = getProjectsBaseUrl();
 const baseURL = rawBaseUrl.endsWith('/api/v1/projects')
   ? rawBaseUrl
   : `${rawBaseUrl.replace(/\/+$/, '')}/api/v1/projects`;

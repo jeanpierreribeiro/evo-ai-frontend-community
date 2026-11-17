@@ -46,12 +46,13 @@ export const ProjectDetailsPage: React.FC = () => {
   const loadProjectData = useCallback(async () => {
     if (!projectId) return;
     try {
-      const [projData, tasksData] = await Promise.all([
+      const [projData, colsData, tasksData] = await Promise.all([
         projectsService.getProject(projectId),
+        projectsService.listColumns(projectId).catch(() => []),
         projectsService.listTasks(projectId),
       ]);
       setProject(projData);
-      setColumns(projData.columns || []);
+      setColumns(colsData?.length ? colsData : (projData.columns || []));
       setTasks(tasksData);
     } catch (err) {
       console.error('Erro ao carregar projeto:', err);
