@@ -1,5 +1,39 @@
 export type BookingStatus = 'ACCEPTED' | 'CANCELLED' | 'REJECTED' | 'PENDING';
 
+export type SummaryStatus = 'PENDING' | 'DONE' | 'FAILED';
+
+export interface MeetingTopics {
+  topic: string;
+  participants: string[];
+  keyPoints: string[];
+  decisions: string[];
+  learnings: string[];
+  factsAndFigures: string[];
+  nextSteps: string[];
+  mentionedEntities: string[];
+}
+
+export interface MeetingSummary {
+  id: string;
+  bookingId: string;
+  status: SummaryStatus;
+  fullSummaryUrl?: string | null;
+  transcriptUrl?: string | null;
+  topics?: MeetingTopics | null;
+  topicsVersion: number;
+  rawTranscript?: string | null;
+  errorMessage?: string | null;
+  generatedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AiStatusResponse {
+  enabled: boolean;
+  host: string;
+  model: string;
+}
+
 export interface Booking {
   id: string;
   uid: string;
@@ -17,6 +51,8 @@ export interface Booking {
   cancellationReason?: string | null;
   metadata?: Record<string, unknown> | null;
   eventType?: EventType | null;
+  hasSummary?: boolean;
+  summary?: MeetingSummary | null;
   createdAt: string;
   updatedAt: string;
 }

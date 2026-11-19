@@ -110,6 +110,7 @@ import OnboardingPage from '@/pages/Setup/OnboardingPage';
 
 // Páginas de agendamento (jprOS + Cal.com Engine)
 import BookingsPage from '@/pages/scheduling/BookingsPage';
+import BookingDetailPage from '@/pages/scheduling/BookingDetailPage';
 import EventTypesPage from '@/pages/scheduling/EventTypesPage';
 import AvailabilityPage from '@/pages/scheduling/AvailabilityPage';
 import PublicPreviewPage from '@/pages/scheduling/PublicPreviewPage';
@@ -124,6 +125,8 @@ import WorkspaceMembersPage from '@/pages/projects/WorkspaceMembersPage';
 import ProjectDetailsPage from '@/pages/projects/ProjectDetailsPage';
 import TaskDetailsPage from '@/pages/projects/TaskDetailsPage';
 import PublicTaskSharePage from '@/pages/projects/public/PublicTaskSharePage';
+import LoansWalletsPage from '@/pages/loans/LoansWalletsPage';
+import { loansUiEnabled } from '@/services/loans/loansConfig';
 
 // Páginas do módulo financeiro (jprOS Finance Submodule)
 import FinanceDashboardPage from '@/pages/finance/FinanceDashboardPage';
@@ -1467,6 +1470,8 @@ const AppRouter = () => {
           <Route path="/conversations/:conversationId" element={ChatRouteElement} />
 
 
+          {loansUiEnabled && <Route path="/loans" element={<PrivateRoute><CustomerRoute><MainLayout><LoansWalletsPage /></MainLayout></CustomerRoute></PrivateRoute>} />}
+
           {/* Scheduling Routes (jprOS + Cal.com Engine) */}
           <Route
             path="/scheduling/bookings"
@@ -1475,6 +1480,18 @@ const AppRouter = () => {
                 <CustomerRoute>
                   <MainLayout>
                     <BookingsPage />
+                  </MainLayout>
+                </CustomerRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/scheduling/bookings/:id"
+            element={
+              <PrivateRoute>
+                <CustomerRoute>
+                  <MainLayout>
+                    <BookingDetailPage />
                   </MainLayout>
                 </CustomerRoute>
               </PrivateRoute>

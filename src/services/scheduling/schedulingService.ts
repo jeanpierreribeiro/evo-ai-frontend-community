@@ -5,6 +5,8 @@ import type {
   Schedule,
   AvailableSlot,
   PublicEventData,
+  MeetingSummary,
+  AiStatusResponse,
 } from '@/types/scheduling';
 
 export interface GetSlotsParams {
@@ -14,6 +16,7 @@ export interface GetSlotsParams {
   eventSlug?: string;
   date: string; // YYYY-MM-DD
   timeZone?: string;
+  excludeBookingId?: string;
 }
 
 export interface GetBookingsParams {
@@ -21,6 +24,8 @@ export interface GetBookingsParams {
   status?: string;
   from?: string;
   to?: string;
+  search?: string;
+  eventTypeId?: string;
   limit?: number;
   offset?: number;
 }
@@ -63,6 +68,11 @@ export const schedulingService = {
     return data;
   },
 
+  async updateBooking(id: string, updateData: Partial<Booking>): Promise<Booking> {
+    const { data } = await schedulingApi.patch(`/bookings/${id}`, updateData);
+    return data;
+  },
+
   async createBooking(bookingData: CreateBookingData): Promise<Booking> {
     const { data } = await schedulingApi.post('/bookings', bookingData);
     return data;
@@ -81,6 +91,32 @@ export const schedulingService = {
       startTime,
       endTime,
     });
+    return data;
+  },
+
+  // Meeting Summaries & AI Topics
+  async getSummary(bookingId: string): Promise<MeetingSummary> {
+    const { data } = await schedulingApi.get(`/bookings/${bookingId}/summary`);
+    return data;
+  },
+
+  async updateSummary(bookingId: string, summaryData: Partial<MeetingSummary>): Promise<MeetingSummary> {
+    const { data } = await schedulingApi.put(`/bookings/${bookingId}/summary`, summaryData);
+    return data;
+  },
+
+  async deleteSummary(bookingId: string): Promise<{ success: boolean }> {
+    const { data } = await schedulingApi.delete(`/bookings/${bookingId}/summary`);
+    return data;
+  },
+
+  async generateSummary(bookingId: string, transcript: string): Promise<MeetingSummary> {
+    const { data } = await schedulingApi.post(`/bookings/${bookingId}/summary/generate`, { transcript });
+    return data;
+  },
+
+  async getAiStatus(): Promise<AiStatusResponse> {
+    const { data } = await schedulingApi.get('/meetings/ai-status');
     return data;
   },
 

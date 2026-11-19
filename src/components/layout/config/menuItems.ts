@@ -1,4 +1,5 @@
 import { LucideIcon } from 'lucide-react';
+import { loansUiEnabled } from '@/services/loans/loansConfig';
 import {
   User,
   LogOut,
@@ -174,6 +175,7 @@ export const getCustomerMenuItems = (t: (key: string) => string): MenuItem[] => 
       },
     ],
   },
+  ...(loansUiEnabled ? [{ id: 'customer-loans', name: 'Empréstimos', href: '/loans', icon: CircleDollarSign }] : []),
   {
     id: 'customer-finance',
     name: t('menu.customer.finance') || 'Financeiro',
